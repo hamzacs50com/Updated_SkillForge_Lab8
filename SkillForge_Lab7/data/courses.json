@@ -1,0 +1,36 @@
+[
+  {
+    "courseId": "a1aed351-ed39-4aa9-a7a4-33f32db0a576",
+    "title": "math 4",
+    "description": "very good course",
+    "instructorId": "855c8255-04a9-4cc6-9af6-c81d5c0b0d43",
+    "lessons": [
+      {
+        "lessonId": "a279446b-86a9-4626-b969-c9e04308de21",
+        "title": "integeration",
+        "content": "kjjdijbiwnbovibkjbeljbljvabliugblvkjkabgi2iublaidiqehjgbeaijvbegwgihvbpiewgtrubvidfb\nkjmvnwibniniw\nfvlibjwib",
+        "resources": []
+      }
+    ],
+    "students": [
+      "25ae91df-9d5e-469d-8e0d-38335ccf4eff"
+    ]
+  },
+  {
+    "courseId": "836fcee0-951a-4dc6-940b-e699a9405806",
+    "title": "math",
+    "description": "hgjhvjhrfegvlif3gfve3ilrfv3iluilrfv3erf hujifjh\n",
+    "instructorId": "406a0bc4-caee-4bcc-857b-1af81b18d57c",
+    "lessons": [
+      {
+        "lessonId": "4a9feae8-5281-43b7-81bb-cce2140e2e57",
+        "title": "hdgi",
+        "content": "cefjkhkgvoi4hjhedgi3utvg5h",
+        "resources": []
+      }
+    ],
+    "students": [
+      "7b09748a-dfd8-4148-9dc6-762d2bec97a3"
+    ]
+  }
+]
