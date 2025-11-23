@@ -1,0 +1,51 @@
+[
+  {
+    "userId": "cd4db3a9-7955-456d-99f6-beb973cde71c",
+    "username": "Admin",
+    "email": "admin@skillforge.com",
+    "passwordHash": "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9",
+    "role": "Admin"
+  },
+  {
+    "enrolledCourses": [
+      "e2a96c44-5edc-4923-8ccc-77a2912a42ac"
+    ],
+    "quizScores": {
+      "3812f46b-70ba-4891-ac92-f6d79c616849": 100,
+      "92545615-1155-441e-a4d8-809d96ea35a1": 100
+    },
+    "certificates": [
+      {
+        "certificateId": "77c4d3a9-27c9-4fac-871a-0b729f47788b",
+        "studentId": "1bb0ac15-14e0-4bfc-9cd8-6f83f82ffa71",
+        "studentName": "hamza",
+        "courseId": "e2a96c44-5edc-4923-8ccc-77a2912a42ac",
+        "courseTitle": "math",
+        "issueDate": "2025-11-23"
+      }
+    ],
+    "userId": "1bb0ac15-14e0-4bfc-9cd8-6f83f82ffa71",
+    "username": "hamza",
+    "email": "hamza@gmail.com",
+    "passwordHash": "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92",
+    "role": "Student"
+  },
+  {
+    "createdCourses": [
+      "e2a96c44-5edc-4923-8ccc-77a2912a42ac",
+      "fc6c9665-cca3-4430-a6cb-c08a563395db"
+    ],
+    "userId": "68c38d0c-43ae-4c5d-91d0-c011c53a7d62",
+    "username": "hazem",
+    "email": "hazem@gmail.com",
+    "passwordHash": "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92",
+    "role": "Instructor"
+  },
+  {
+    "userId": "8758a954-ab2d-4be5-9836-230f7e320cd8",
+    "username": "Admin ",
+    "email": "admin@gmail.com",
+    "passwordHash": "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92",
+    "role": "Admin"
+  }
+]
