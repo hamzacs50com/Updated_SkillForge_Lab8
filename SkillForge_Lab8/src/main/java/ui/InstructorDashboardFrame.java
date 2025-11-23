@@ -1,351 +1,200 @@
-package ui;
 
 import database.JsonDatabaseManager;
-import models.Course;
-import models.Instructor;
-import models.Lesson;
-import models.Student;
-
+import models.*;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class InstructorDashboardFrame extends JFrame {
-
-    private JsonDatabaseManager dbManager;
+    private JsonDatabaseManager db = JsonDatabaseManager.getInstance();
     private Instructor instructor;
+    private DefaultListModel<Course> cModel = new DefaultListModel<>();
+    private JList<Course> cList = new JList<>(cModel);
+    private DefaultListModel<Lesson> lModel = new DefaultListModel<>();
+    private JList<Lesson> lList = new JList<>(lModel);
+    private DefaultListModel<Student> sModel = new DefaultListModel<>();
+    private JList<Student> sList = new JList<>(sModel);
 
-    // UI Components
-    private JList<Course> courseList;
-    private JList<Lesson> lessonList;
-    private JList<Student> studentList;
-    private DefaultListModel<Course> courseListModel;
-    private DefaultListModel<Lesson> lessonListModel;
-    private DefaultListModel<Student> studentListModel;
-    
-    private JButton createCourseButton;
-    private JButton editCourseButton;
-    private JButton deleteCourseButton;
-    private JButton addLessonButton;
-    private JButton editLessonButton;
-    private JButton deleteLessonButton;
-
-    public InstructorDashboardFrame(Instructor instructor) {
-        this.dbManager = JsonDatabaseManager.getInstance();
-        this.instructor = instructor;
-
-        setTitle("Instructor Dashboard - Welcome, " + instructor.getUsername());
-        setSize(850, 650);
+    public InstructorDashboardFrame(Instructor i) {
+        this.instructor = i;
+        setTitle("Instructor - " + i.getUsername());
+        setSize(900, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-        setLayout(new BorderLayout(10, 10));
+        setLayout(new BorderLayout());
 
-        // --- Top Panel with Logout ---
-        JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
-        topPanel.add(new JLabel("Instructor Dashboard", JLabel.CENTER), BorderLayout.CENTER);
-        JButton logoutButton = new JButton("Logout");
-        topPanel.add(logoutButton, BorderLayout.EAST);
-        add(topPanel, BorderLayout.NORTH);
+        JPanel top = new JPanel(new BorderLayout());
+        JButton logout = new JButton("Logout");
+        top.add(new JLabel("Instructor Dashboard", JLabel.CENTER));
+        top.add(logout, BorderLayout.EAST);
+        add(top, BorderLayout.NORTH);
 
-        // --- Main Content Area ---
-        // 1. Course List (Left)
-        courseListModel = new DefaultListModel<>();
-        courseList = new JList<>(courseListModel);
-        courseList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        JScrollPane courseScrollPane = new JScrollPane(courseList);
-        
-        JPanel coursePanel = new JPanel(new BorderLayout());
-        
-        // Panel for course buttons
-        JPanel courseButtonPanel = new JPanel(new FlowLayout());
-        createCourseButton = new JButton("Create");
-        editCourseButton = new JButton("Edit");
-        deleteCourseButton = new JButton("Delete");
-        courseButtonPanel.add(createCourseButton);
-        courseButtonPanel.add(editCourseButton);
-        courseButtonPanel.add(deleteCourseButton);
-        
-        coursePanel.add(courseScrollPane, BorderLayout.CENTER);
-        coursePanel.add(courseButtonPanel, BorderLayout.SOUTH);
-        coursePanel.setBorder(BorderFactory.createTitledBorder("My Courses"));
+        JPanel cPanel = new JPanel(new BorderLayout());
+        JPanel cBtn = new JPanel();
+        JButton cAdd = new JButton("Create"), cEdit = new JButton("Edit"), cDel = new JButton("Delete");
+        cBtn.add(cAdd); cBtn.add(cEdit); cBtn.add(cDel);
+        cPanel.add(new JScrollPane(cList), BorderLayout.CENTER);
+        cPanel.add(cBtn, BorderLayout.SOUTH);
+        cPanel.setBorder(BorderFactory.createTitledBorder("Courses"));
 
-        // 2. Details (Right) - Using a JTabbedPane
-        JTabbedPane detailsPane = new JTabbedPane();
+        JTabbedPane tabs = new JTabbedPane();
+        JPanel lPanel = new JPanel(new BorderLayout());
+        JPanel lBtn = new JPanel();
+        JButton lAdd = new JButton("Add"), lEdit = new JButton("Edit"), lDel = new JButton("Delete");
+        lBtn.add(lAdd); lBtn.add(lEdit); lBtn.add(lDel);
+        lPanel.add(new JScrollPane(lList), BorderLayout.CENTER);
+        lPanel.add(lBtn, BorderLayout.SOUTH);
+        tabs.addTab("Lessons", lPanel);
+        tabs.addTab("Students", new JScrollPane(sList));
         
-        // 2a. Lessons Tab
-        JPanel lessonPanel = new JPanel(new BorderLayout());
-        lessonListModel = new DefaultListModel<>();
-        lessonList = new JList<>(lessonListModel);
-        JScrollPane lessonScrollPane = new JScrollPane(lessonList);
-        
-        // Panel for lesson buttons
-        JPanel lessonButtonPanel = new JPanel(new FlowLayout());
-        addLessonButton = new JButton("Add");
-        editLessonButton = new JButton("Edit");
-        deleteLessonButton = new JButton("Delete");
-        lessonButtonPanel.add(addLessonButton);
-        lessonButtonPanel.add(editLessonButton);
-        lessonButtonPanel.add(deleteLessonButton);
-        
-        lessonPanel.add(lessonScrollPane, BorderLayout.CENTER);
-        lessonPanel.add(lessonButtonPanel, BorderLayout.SOUTH);
-        
-        // 2b. Enrolled Students Tab
-        JPanel studentPanel = new JPanel(new BorderLayout());
-        studentListModel = new DefaultListModel<>();
-        studentList = new JList<>(studentListModel);
-        JScrollPane studentScrollPane = new JScrollPane(studentList);
-        studentPanel.add(studentScrollPane, BorderLayout.CENTER);
-        
-        detailsPane.addTab("Lessons", lessonPanel);
-        detailsPane.addTab("Enrolled Students", studentPanel);
+        JPanel iPanel = new JPanel(new BorderLayout());
+        JButton vChart = new JButton("View Charts");
+        iPanel.add(new JLabel("Select a course for insights", JLabel.CENTER), BorderLayout.CENTER);
+        iPanel.add(vChart, BorderLayout.SOUTH);
+        tabs.addTab("Insights", iPanel);
 
-        // --- Main Split Pane ---
-        JSplitPane mainSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, coursePanel, detailsPane);
-        mainSplitPane.setResizeWeight(0.45);
-        add(mainSplitPane, BorderLayout.CENTER);
-        
-        // --- Load Initial Data ---
-        refreshCourseList();
+        add(new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, cPanel, tabs), BorderLayout.CENTER);
 
-        // --- Action Listeners ---
-        logoutButton.addActionListener(e -> {
-            LoginFrame loginFrame = new LoginFrame();
-            loginFrame.setVisible(true);
-            InstructorDashboardFrame.this.dispose();
+        refreshC();
+        
+        logout.addActionListener(e -> { new LoginFrame().setVisible(true); dispose(); });
+        cList.addListSelectionListener(e -> { if(!e.getValueIsAdjusting()) refreshLS(); });
+        
+        // --- COURSE ACTIONS ---
+        cAdd.addActionListener(e -> {
+            String t = JOptionPane.showInputDialog("Title:");
+            String d = JOptionPane.showInputDialog("Desc:");
+            if(t!=null && d!=null) { db.createCourse(t,d,i.getUserId()); refreshC(); }
         });
-
-        createCourseButton.addActionListener(e -> handleCreateCourse());
-        editCourseButton.addActionListener(e -> handleEditCourse());
-        deleteCourseButton.addActionListener(e -> handleDeleteCourse());
+        cEdit.addActionListener(e -> {
+            Course c = cList.getSelectedValue();
+            if(c!=null) { 
+                String t = JOptionPane.showInputDialog("Title:", c.getTitle());
+                String d = JOptionPane.showInputDialog("Desc:", c.getDescription());
+                if(t!=null) { db.updateCourse(c.getCourseId(), t, d); refreshC(); }
+            }
+        });
+        cDel.addActionListener(e -> {
+            Course c = cList.getSelectedValue();
+            if(c!=null && JOptionPane.showConfirmDialog(this,"Delete?")==0) { db.deleteCourse(c.getCourseId()); refreshC(); }
+        });
         
-        addLessonButton.addActionListener(e -> handleAddLesson());
-        editLessonButton.addActionListener(e -> handleEditLesson());
-        deleteLessonButton.addActionListener(e -> handleDeleteLesson());
+        // --- LESSON ACTIONS (VIP VERSION: MANUAL QUIZ) ---
+        lAdd.addActionListener(e -> handleAddLesson());
+        lEdit.addActionListener(e -> handleEditLesson());
+        lDel.addActionListener(e -> {
+            Course c = cList.getSelectedValue(); Lesson l = lList.getSelectedValue();
+            if(c!=null && l!=null && JOptionPane.showConfirmDialog(this,"Delete Lesson?")==0) { 
+                db.deleteLesson(c.getCourseId(), l.getLessonId()); refreshLS(); 
+            }
+        });
         
-        courseList.addListSelectionListener(e -> {
-            if (!e.getValueIsAdjusting()) {
-                Course selectedCourse = courseList.getSelectedValue();
-                if (selectedCourse != null) {
-                    // Update both lessons and students tabs
-                    refreshLessonList(selectedCourse);
-                    refreshStudentList(selectedCourse);
-                } else {
-                    lessonListModel.clear();
-                    studentListModel.clear();
-                }
+        vChart.addActionListener(e -> { if(cList.getSelectedValue()!=null) new ChartFrame(this, cList.getSelectedValue()).setVisible(true); });
+    }
+    
+    // --- HELPER METHODS ---
+    private void refreshC() { 
+        cModel.clear(); 
+        for(Course c : db.getCoursesByInstructor(instructor.getUserId())) cModel.addElement(c); 
+        cList.setCellRenderer(new DefaultListCellRenderer() {
+            public Component getListCellRendererComponent(JList<?> l, Object v, int i, boolean s, boolean f) {
+                super.getListCellRendererComponent(l,v,i,s,f);
+                Course c = (Course)v;
+                if(c.getStatus() == CourseStatus.REJECTED) setForeground(Color.RED);
+                else if(c.getStatus() == CourseStatus.PENDING) setForeground(Color.BLUE);
+                return this;
             }
         });
     }
-
-    // --- Refresh Methods ---
-
-    private void refreshCourseList() {
-        courseListModel.clear();
-        List<Course> courses = dbManager.getCoursesByInstructor(instructor.getUserId());
-        for (Course course : courses) {
-            courseListModel.addElement(course);
-        }
-    }
-    
-    private void refreshLessonList(Course course) {
-        lessonListModel.clear();
-        if (course != null && course.getLessons() != null) {
-            for (Lesson lesson : course.getLessons()) {
-                lessonListModel.addElement(lesson);
-            }
-        }
-    }
-    
-    private void refreshStudentList(Course course) {
-        studentListModel.clear();
-        if (course != null) {
-            List<Student> students = dbManager.getEnrolledStudents(course.getCourseId());
-            for (Student student : students) {
-                studentListModel.addElement(student);
-            }
+    private void refreshLS() {
+        lModel.clear(); sModel.clear();
+        Course c = cList.getSelectedValue();
+        if(c!=null) {
+            // RELOAD COURSE FROM DB TO GET LATEST DATA
+            Course refreshedCourse = db.getCourseById(c.getCourseId());
+            if(refreshedCourse.getLessons()!=null) for(Lesson l : refreshedCourse.getLessons()) lModel.addElement(l);
+            for(Student s : db.getEnrolledStudents(refreshedCourse.getCourseId())) sModel.addElement(s);
         }
     }
 
-    // --- Course Action Handlers ---
-
-    private void handleCreateCourse() {
-        JTextField titleField = new JTextField(20);
-        JTextArea descArea = new JTextArea(5, 20);
-        JScrollPane descScrollPane = new JScrollPane(descArea);
-        
-        JPanel panel = new JPanel(new BorderLayout(5, 5));
-        panel.add(new JLabel("Title:"), BorderLayout.NORTH);
-        panel.add(titleField, BorderLayout.CENTER);
-        panel.add(new JLabel("Description:"), BorderLayout.SOUTH);
-
-        JPanel panelMain = new JPanel(new BorderLayout(5, 5));
-        panelMain.add(panel, BorderLayout.NORTH);
-        panelMain.add(descScrollPane, BorderLayout.CENTER);
-
-        int result = JOptionPane.showConfirmDialog(this, panelMain, "Create New Course", 
-                                                   JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-        
-        if (result == JOptionPane.OK_OPTION) {
-            String title = titleField.getText();
-            String description = descArea.getText();
-            if (!title.isEmpty() && !description.isEmpty()) {
-                dbManager.createCourse(title, description, instructor.getUserId());
-                refreshCourseList();
-            } else {
-                JOptionPane.showMessageDialog(this, "Title and Description cannot be empty.", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        }
-    }
-    
-    private void handleEditCourse() {
-        Course selectedCourse = courseList.getSelectedValue();
-        if (selectedCourse == null) {
-            JOptionPane.showMessageDialog(this, "Please select a course to edit.", "Error", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
-        JTextField titleField = new JTextField(selectedCourse.getTitle(), 20);
-        JTextArea descArea = new JTextArea(selectedCourse.getDescription(), 5, 20);
-        JScrollPane descScrollPane = new JScrollPane(descArea);
-        
-        JPanel panel = new JPanel(new BorderLayout(5, 5));
-        panel.add(new JLabel("Title:"), BorderLayout.NORTH);
-        panel.add(titleField, BorderLayout.CENTER);
-        panel.add(new JLabel("Description:"), BorderLayout.SOUTH);
-
-        JPanel panelMain = new JPanel(new BorderLayout(5, 5));
-        panelMain.add(panel, BorderLayout.NORTH);
-        panelMain.add(descScrollPane, BorderLayout.CENTER);
-
-        int result = JOptionPane.showConfirmDialog(this, panelMain, "Edit Course", 
-                                                   JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-        
-        if (result == JOptionPane.OK_OPTION) {
-            String newTitle = titleField.getText();
-            String newDescription = descArea.getText();
-            if (!newTitle.isEmpty() && !newDescription.isEmpty()) {
-                dbManager.updateCourse(selectedCourse.getCourseId(), newTitle, newDescription);
-                refreshCourseList();
-            } else {
-                JOptionPane.showMessageDialog(this, "Title and Description cannot be empty.", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        }
-    }
-    
-    private void handleDeleteCourse() {
-        Course selectedCourse = courseList.getSelectedValue();
-        if (selectedCourse == null) {
-            JOptionPane.showMessageDialog(this, "Please select a course to delete.", "Error", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-        
-        int result = JOptionPane.showConfirmDialog(this, 
-            "Are you sure you want to delete this course?\n" + selectedCourse.getTitle(),
-            "Confirm Deletion", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-            
-        if (result == JOptionPane.YES_OPTION) {
-            dbManager.deleteCourse(selectedCourse.getCourseId());
-            refreshCourseList();
-            // Clear the other lists as the course is gone
-            lessonListModel.clear();
-            studentListModel.clear();
-        }
-    }
-    
-    // --- Lesson Action Handlers ---
+    // --- MANUAL QUIZ BUILDER LOGIC ---
     
     private void handleAddLesson() {
-        Course selectedCourse = courseList.getSelectedValue();
-        if (selectedCourse == null) {
-            JOptionPane.showMessageDialog(this, "Please select a course first.", "Error", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
-        JTextField titleField = new JTextField(20);
-        JTextArea contentArea = new JTextArea(5, 20);
-        JScrollPane contentScrollPane = new JScrollPane(contentArea);
+        Course c = cList.getSelectedValue();
+        if(c==null) { JOptionPane.showMessageDialog(this, "Select a course"); return; }
         
-        JPanel panel = new JPanel(new BorderLayout(5, 5));
-        panel.add(new JLabel("Lesson Title:"), BorderLayout.NORTH);
-        panel.add(titleField, BorderLayout.CENTER);
-        panel.add(new JLabel("Lesson Content:"), BorderLayout.SOUTH);
-
-        JPanel panelMain = new JPanel(new BorderLayout(5, 5));
-        panelMain.add(panel, BorderLayout.NORTH);
-        panelMain.add(contentScrollPane, BorderLayout.CENTER);
-
-        int result = JOptionPane.showConfirmDialog(this, panelMain, "Add New Lesson", 
-                                                   JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        JTextField tField = new JTextField();
+        JTextArea cArea = new JTextArea(5, 20);
+        JPanel p = new JPanel(new GridLayout(0, 1));
+        p.add(new JLabel("Title:")); p.add(tField);
+        p.add(new JLabel("Content:")); p.add(new JScrollPane(cArea));
         
-        if (result == JOptionPane.OK_OPTION) {
-            String title = titleField.getText();
-            String content = contentArea.getText();
-            if (!title.isEmpty()) {
-                dbManager.addLesson(selectedCourse.getCourseId(), title, content);
-                refreshLessonList(selectedCourse);
-            } else {
-                JOptionPane.showMessageDialog(this, "Title cannot be empty.", "Error", JOptionPane.ERROR_MESSAGE);
+        int res = JOptionPane.showConfirmDialog(this, p, "Add Lesson", JOptionPane.OK_CANCEL_OPTION);
+        if(res == JOptionPane.OK_OPTION && !tField.getText().isEmpty()) {
+            // Ask to build quiz
+            Quiz q = null;
+            if(JOptionPane.showConfirmDialog(this, "Create a Quiz for this lesson?", "Quiz", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                q = buildQuiz();
             }
+            db.addLesson(c.getCourseId(), tField.getText(), cArea.getText(), q);
+            refreshLS();
         }
     }
-    
+
     private void handleEditLesson() {
-        Course selectedCourse = courseList.getSelectedValue();
-        Lesson selectedLesson = lessonList.getSelectedValue();
+        Course c = cList.getSelectedValue();
+        Lesson l = lList.getSelectedValue();
+        if(c==null || l==null) { JOptionPane.showMessageDialog(this, "Select a lesson"); return; }
         
-        if (selectedCourse == null || selectedLesson == null) {
-            JOptionPane.showMessageDialog(this, "Please select a course and a lesson to edit.", "Error", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
-        JTextField titleField = new JTextField(selectedLesson.getTitle(), 20);
-        JTextArea contentArea = new JTextArea(selectedLesson.getContent(), 5, 20);
-        JScrollPane contentScrollPane = new JScrollPane(contentArea);
+        JTextField tField = new JTextField(l.getTitle());
+        JTextArea cArea = new JTextArea(l.getContent(), 5, 20);
+        JPanel p = new JPanel(new GridLayout(0, 1));
+        p.add(new JLabel("Title:")); p.add(tField);
+        p.add(new JLabel("Content:")); p.add(new JScrollPane(cArea));
         
-        JPanel panel = new JPanel(new BorderLayout(5, 5));
-        panel.add(new JLabel("Lesson Title:"), BorderLayout.NORTH);
-        panel.add(titleField, BorderLayout.CENTER);
-        panel.add(new JLabel("Lesson Content:"), BorderLayout.SOUTH);
-
-        JPanel panelMain = new JPanel(new BorderLayout(5, 5));
-        panelMain.add(panel, BorderLayout.NORTH);
-        panelMain.add(contentScrollPane, BorderLayout.CENTER);
-
-        int result = JOptionPane.showConfirmDialog(this, panelMain, "Edit Lesson", 
-                                                   JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-        
-        if (result == JOptionPane.OK_OPTION) {
-            String newTitle = titleField.getText();
-            String newContent = contentArea.getText();
-            if (!newTitle.isEmpty()) {
-                dbManager.updateLesson(selectedCourse.getCourseId(), selectedLesson.getLessonId(), newTitle, newContent);
-                refreshLessonList(selectedCourse);
-            } else {
-                JOptionPane.showMessageDialog(this, "Title cannot be empty.", "Error", JOptionPane.ERROR_MESSAGE);
+        int res = JOptionPane.showConfirmDialog(this, p, "Edit Lesson", JOptionPane.OK_CANCEL_OPTION);
+        if(res == JOptionPane.OK_OPTION && !tField.getText().isEmpty()) {
+            Quiz q = null; // Default: don't update quiz
+            // Check if user wants to replace quiz
+            if(JOptionPane.showConfirmDialog(this, "Replace/Update Quiz?", "Quiz", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                q = buildQuiz();
             }
+            // If q is null, it means we don't change the quiz, UNLESS we explicitly deleted it.
+            // For simplicity in this lab: If they say "No" to replacing, we pass null, and DB manager keeps old quiz.
+            // If they say "Yes" and build a new one, we pass the new one.
+            db.updateLesson(c.getCourseId(), l.getLessonId(), tField.getText(), cArea.getText(), q);
+            refreshLS();
         }
     }
-    
-    private void handleDeleteLesson() {
-        Course selectedCourse = courseList.getSelectedValue();
-        Lesson selectedLesson = lessonList.getSelectedValue();
-        
-        if (selectedCourse == null || selectedLesson == null) {
-            JOptionPane.showMessageDialog(this, "Please select a course and a lesson to delete.", "Error", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
 
-        int result = JOptionPane.showConfirmDialog(this, 
-            "Are you sure you want to delete this lesson?\n" + selectedLesson.getTitle(),
-            "Confirm Deletion", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+    // The Logic to manually add questions
+    private Quiz buildQuiz() {
+        List<Question> questions = new ArrayList<>();
+        while(true) {
+            String qText = JOptionPane.showInputDialog("Enter Question Text (or Cancel to finish):");
+            if(qText == null || qText.trim().isEmpty()) break;
             
-        if (result == JOptionPane.YES_OPTION) {
-            dbManager.deleteLesson(selectedCourse.getCourseId(), selectedLesson.getLessonId());
-            refreshLessonList(selectedCourse);
+            String opt1 = JOptionPane.showInputDialog("Option 1:");
+            String opt2 = JOptionPane.showInputDialog("Option 2:");
+            String opt3 = JOptionPane.showInputDialog("Option 3:");
+            String correctStr = JOptionPane.showInputDialog("Correct Option Index (1, 2, or 3):");
+            
+            if(opt1!=null && opt2!=null && opt3!=null && correctStr!=null) {
+                try {
+                    int correctIdx = Integer.parseInt(correctStr) - 1; // Convert 1-based to 0-based
+                    if(correctIdx < 0 || correctIdx > 2) correctIdx = 0;
+                    
+                    List<String> opts = new ArrayList<>();
+                    opts.add(opt1); opts.add(opt2); opts.add(opt3);
+                    questions.add(new Question(qText, opts, correctIdx));
+                } catch(NumberFormatException e) {}
+            }
+            
+            if(JOptionPane.showConfirmDialog(this, "Add another question?", "Next", JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION) break;
         }
+        if(questions.isEmpty()) return null;
+        return new Quiz(UUID.randomUUID().toString(), "", questions);
     }
 }
