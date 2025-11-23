@@ -1,3 +1,4 @@
+package ui;
 
 import database.JsonDatabaseManager;
 import models.*;
