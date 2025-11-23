@@ -1,0 +1,103 @@
+[
+  {
+    "courseId": "e2a96c44-5edc-4923-8ccc-77a2912a42ac",
+    "title": "math1",
+    "instructorId": "68c38d0c-43ae-4c5d-91d0-c011c53a7d62",
+    "lessons": [
+      {
+        "lessonId": "3812f46b-70ba-4891-ac92-f6d79c616849",
+        "title": "lesson 1",
+        "content": "khgckughckl",
+        "resources": [],
+        "quiz": {
+          "quizId": "fce5468c-96db-4238-a286-204d8150c9cc",
+          "lessonId": "3812f46b-70ba-4891-ac92-f6d79c616849",
+          "questions": [
+            {
+              "questionText": "Sample Question 1 for lesson 1",
+              "options": [
+                "Option A",
+                "Correct Option B",
+                "Option C"
+              ],
+              "correctOptionIndex": 1
+            },
+            {
+              "questionText": "Sample Question 2",
+              "options": [
+                "Correct Option A",
+                "Option B",
+                "Option C"
+              ],
+              "correctOptionIndex": 0
+            }
+          ]
+        }
+      },
+      {
+        "lessonId": "92545615-1155-441e-a4d8-809d96ea35a1",
+        "title": "ugcygcuk",
+        "content": "yjgfgcygciyugucv",
+        "resources": [],
+        "quiz": {
+          "quizId": "21805e78-2828-4d08-a1b3-428634cc09f2",
+          "lessonId": "",
+          "questions": [
+            {
+              "questionText": "hgckgcku a",
+              "options": [
+                "128",
+                "125",
+                "888"
+              ],
+              "correctOptionIndex": 0
+            }
+          ]
+        }
+      }
+    ],
+    "students": [
+      "1bb0ac15-14e0-4bfc-9cd8-6f83f82ffa71"
+    ],
+    "status": "APPROVED"
+  },
+  {
+    "courseId": "fc6c9665-cca3-4430-a6cb-c08a563395db",
+    "title": "math2",
+    "description": "jkjbibpibqefupirjvucryeecyiubhipubqvpiuehabrpivujbqpiubp",
+    "instructorId": "68c38d0c-43ae-4c5d-91d0-c011c53a7d62",
+    "lessons": [
+      {
+        "lessonId": "33acffe6-c76b-43c0-ae8a-dcbea9fe0f8c",
+        "title": "jdebiwq",
+        "content": "lkdvfjbepib",
+        "resources": [],
+        "quiz": {
+          "quizId": "db5f27dc-aa93-4c56-a308-fab6160b4f0a",
+          "lessonId": "33acffe6-c76b-43c0-ae8a-dcbea9fe0f8c",
+          "questions": [
+            {
+              "questionText": "Is jdebiwq a valid topic?",
+              "options": [
+                "True",
+                "False"
+              ],
+              "correctOptionIndex": 0
+            },
+            {
+              "questionText": "Select Option A for jdebiwq",
+              "options": [
+                "A",
+                "B",
+                "C"
+              ],
+              "correctOptionIndex": 0
+            }
+          ]
+        }
+      }
+    ],
+    "students": [],
+    "status": "APPROVED"
+  }
+]
