@@ -1,221 +1,114 @@
 package ui;
 
 import database.JsonDatabaseManager;
-import models.Course;
-import models.Lesson;
-import models.Student;
-
+import models.*;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.List;
-import java.util.Map;
 
 public class StudentDashboardFrame extends JFrame {
-
-    private JsonDatabaseManager dbManager;
+    private JsonDatabaseManager db = JsonDatabaseManager.getInstance();
     private Student student;
+    private DefaultListModel<Course> allModel = new DefaultListModel<>();
+    private DefaultListModel<Course> myModel = new DefaultListModel<>();
+    private DefaultListModel<Lesson> lModel = new DefaultListModel<>();
+    private DefaultListModel<Certificate> certModel = new DefaultListModel<>();
+    private JList<Course> allList = new JList<>(allModel);
+    private JList<Course> myList = new JList<>(myModel);
+    private JList<Lesson> lList = new JList<>(lModel);
+    private JTextArea content = new JTextArea();
+    private JButton takeQuiz = new JButton("Take Quiz"), unmark = new JButton("Unmark");
 
-    private JList<Course> allCoursesList;
-    private JList<Course> myCoursesList;
-    private JList<Lesson> lessonList;
-    private JTextArea lessonContentArea;
-    private DefaultListModel<Course> allCoursesModel;
-    private DefaultListModel<Course> myCoursesModel;
-    private DefaultListModel<Lesson> lessonListModel;
-
-    public StudentDashboardFrame(Student student) {
-        this.dbManager = JsonDatabaseManager.getInstance();
-        this.student = student;
-
-        setTitle("Student Dashboard - Welcome, " + student.getUsername());
-        setSize(800, 600);
+    public StudentDashboardFrame(Student s) {
+        this.student = s;
+        setTitle("Student - " + s.getUsername());
+        setSize(850, 650);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
-        // --- Tabbed Pane ---
-        JTabbedPane tabbedPane = new JTabbedPane();
+        JTabbedPane tabs = new JTabbedPane();
         
-        // --- 1. Available Courses Tab ---
-        JPanel allCoursesPanel = new JPanel(new BorderLayout(10, 10));
-        allCoursesModel = new DefaultListModel<>();
-        allCoursesList = new JList<>(allCoursesModel);
-        allCoursesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        JScrollPane allCoursesScrollPane = new JScrollPane(allCoursesList);
-        
-        JButton enrollButton = new JButton("Enroll in Selected Course");
-        
-        allCoursesPanel.add(new JLabel("All Available Courses", JLabel.CENTER), BorderLayout.NORTH);
-        allCoursesPanel.add(allCoursesScrollPane, BorderLayout.CENTER);
-        allCoursesPanel.add(enrollButton, BorderLayout.SOUTH);
-        
-        tabbedPane.addTab("Available Courses", allCoursesPanel);
+        JPanel p1 = new JPanel(new BorderLayout());
+        JButton enroll = new JButton("Enroll");
+        p1.add(new JScrollPane(allList), BorderLayout.CENTER); p1.add(enroll, BorderLayout.SOUTH);
+        tabs.addTab("Available", p1);
 
-        // --- 2. My Courses Tab ---
-        JPanel myCoursesPanel = new JPanel(new BorderLayout(10, 10));
-        myCoursesModel = new DefaultListModel<>();
-        myCoursesList = new JList<>(myCoursesModel);
-        myCoursesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        JScrollPane myCoursesScrollPane = new JScrollPane(myCoursesList);
-        
-        // Panel to show lessons for the selected course
-        JPanel lessonPanel = new JPanel(new BorderLayout(5, 5));
-        lessonPanel.setBorder(BorderFactory.createTitledBorder("Lessons"));
-        
-        lessonListModel = new DefaultListModel<>();
-        lessonList = new JList<>(lessonListModel);
-        JScrollPane lessonListScrollPane = new JScrollPane(lessonList);
-        
-        lessonContentArea = new JTextArea(10, 30);
-        lessonContentArea.setEditable(false);
-        lessonContentArea.setLineWrap(true);
-        lessonContentArea.setWrapStyleWord(true);
-        JScrollPane contentScrollPane = new JScrollPane(lessonContentArea);
-        
-        JButton markCompletedButton = new JButton("Mark as Completed");
+        JPanel p2 = new JPanel(new BorderLayout());
+        JPanel lPanel = new JPanel(new BorderLayout());
+        JPanel bPanel = new JPanel();
+        bPanel.add(takeQuiz); bPanel.add(unmark);
+        takeQuiz.setEnabled(false); unmark.setEnabled(false);
+        lPanel.add(new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new JScrollPane(lList), new JScrollPane(content)), BorderLayout.CENTER);
+        lPanel.add(bPanel, BorderLayout.SOUTH);
+        p2.add(new JSplitPane(JSplitPane.VERTICAL_SPLIT, new JScrollPane(myList), lPanel), BorderLayout.CENTER);
+        tabs.addTab("My Courses", p2);
 
-        JSplitPane lessonSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, lessonListScrollPane, contentScrollPane);
-        lessonSplitPane.setResizeWeight(0.4);
-        
-        lessonPanel.add(lessonSplitPane, BorderLayout.CENTER);
-        lessonPanel.add(markCompletedButton, BorderLayout.SOUTH);
+        tabs.addTab("Certificates", new JScrollPane(new JList<>(certModel)));
 
-        // Main layout for "My Courses" tab
-        JSplitPane myCoursesSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, myCoursesScrollPane, lessonPanel);
-        myCoursesSplitPane.setResizeWeight(0.5);
-        
-        myCoursesPanel.add(new JLabel("My Enrolled Courses", JLabel.CENTER), BorderLayout.NORTH);
-        myCoursesPanel.add(myCoursesSplitPane, BorderLayout.CENTER);
-        
-        tabbedPane.addTab("My Courses", myCoursesPanel);
+        JButton logout = new JButton("Logout");
+        add(logout, BorderLayout.NORTH);
+        add(tabs, BorderLayout.CENTER);
 
-        // --- Logout Button ---
-        JButton logoutButton = new JButton("Logout");
-        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        topPanel.add(logoutButton);
-        
-        add(topPanel, BorderLayout.NORTH);
-        add(tabbedPane, BorderLayout.CENTER);
+        refresh();
 
-        // --- Load Initial Data ---
-        refreshAllCoursesList();
-        refreshMyCoursesList();
-
-        // --- Action Listeners ---
+        logout.addActionListener(e -> { new LoginFrame().setVisible(true); dispose(); });
+        enroll.addActionListener(e -> { 
+            if(allList.getSelectedValue()!=null) { 
+                db.enrollStudentInCourse(student.getUserId(), allList.getSelectedValue().getCourseId()); 
+                refresh(); 
+            } 
+        });
         
-        enrollButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Course selectedCourse = allCoursesList.getSelectedValue();
-                if (selectedCourse != null) {
-                    dbManager.enrollStudentInCourse(student.getUserId(), selectedCourse.getCourseId());
-                    refreshAllCoursesList(); // Refresh both lists
-                    refreshMyCoursesList();
-                    JOptionPane.showMessageDialog(StudentDashboardFrame.this, "Enrolled in " + selectedCourse.getTitle());
-                } else {
-                    JOptionPane.showMessageDialog(StudentDashboardFrame.this, "Please select a course to enroll in.", "Error", JOptionPane.WARNING_MESSAGE);
+        myList.addListSelectionListener(e -> {
+            if(!e.getValueIsAdjusting()) {
+                lModel.clear();
+                Course c = myList.getSelectedValue();
+                if(c!=null && c.getLessons()!=null) for(Lesson l : c.getLessons()) lModel.addElement(l);
+            }
+        });
+        
+        lList.addListSelectionListener(e -> {
+            if(!e.getValueIsAdjusting()) {
+                Lesson l = lList.getSelectedValue();
+                if(l!=null) {
+                    content.setText(l.getContent());
+                    boolean done = student.isLessonCompleted(l.getLessonId());
+                    takeQuiz.setEnabled(l.getQuiz()!=null);
+                    unmark.setEnabled(done);
                 }
             }
         });
         
-        myCoursesList.addListSelectionListener(e -> {
-            if (!e.getValueIsAdjusting()) {
-                Course selectedCourse = myCoursesList.getSelectedValue();
-                if (selectedCourse != null) {
-                    refreshLessonList(selectedCourse);
-                }
+        takeQuiz.addActionListener(e -> {
+            Course c = myList.getSelectedValue(); Lesson l = lList.getSelectedValue();
+            if(c!=null && l!=null && l.getQuiz() != null) {
+                new QuizFrame(this, student, c, l).setVisible(true);
+                refresh();
             }
         });
         
-        lessonList.addListSelectionListener(e -> {
-            if (!e.getValueIsAdjusting()) {
-                Lesson selectedLesson = lessonList.getSelectedValue();
-                if (selectedLesson != null) {
-                    // Display lesson content
-                    String content = "Title: " + selectedLesson.getTitle() + "\n\n"
-                                   + "Content: " + selectedLesson.getContent() + "\n\n"
-                                   + "Resources: " + String.join(", ", selectedLesson.getResources());
-                    lessonContentArea.setText(content);
-                } else {
-                    lessonContentArea.setText("");
-                }
-            }
-        });
-        
-        markCompletedButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Course selectedCourse = myCoursesList.getSelectedValue();
-                Lesson selectedLesson = lessonList.getSelectedValue();
-                if (selectedCourse != null && selectedLesson != null) {
-                    dbManager.markLessonAsCompleted(student.getUserId(), selectedCourse.getCourseId(), selectedLesson.getLessonId());
-                    JOptionPane.showMessageDialog(StudentDashboardFrame.this, "Lesson marked as completed!");
-                    // You could add a visual indicator (e.g., change list renderer)
-                    refreshLessonList(selectedCourse); // Refresh to update visuals
-                } else {
-                    JOptionPane.showMessageDialog(StudentDashboardFrame.this, "Please select a course and a lesson.", "Error", JOptionPane.WARNING_MESSAGE);
-                }
-            }
-        });
-
-        logoutButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                LoginFrame loginFrame = new LoginFrame();
-                loginFrame.setVisible(true);
-                StudentDashboardFrame.this.dispose();
+        unmark.addActionListener(e -> {
+            Lesson l = lList.getSelectedValue();
+            if(l!=null && JOptionPane.showConfirmDialog(this, "Reset progress?", "Confirm", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                db.unmarkLessonAsCompleted(student.getUserId(), l.getLessonId());
+                refresh();
             }
         });
     }
 
-    private void refreshAllCoursesList() {
-        allCoursesModel.clear();
-        List<Course> allCourses = dbManager.getAllCourses();
-        List<String> enrolledIds = student.getEnrolledCourses();
-        // Only show courses the student is NOT already enrolled in
-        for (Course course : allCourses) {
-            if (!enrolledIds.contains(course.getCourseId())) {
-                allCoursesModel.addElement(course);
-            }
-        }
-    }
-
-    private void refreshMyCoursesList() {
-        myCoursesModel.clear();
-        List<Course> myCourses = dbManager.getEnrolledCourses(student.getUserId());
-        for (Course course : myCourses) {
-            myCoursesModel.addElement(course);
-        }
-    }
-    
-    private void refreshLessonList(Course course) {
-        lessonListModel.clear();
-        lessonContentArea.setText("");
+    private void refresh() {
+        this.student = db.getStudentById(student.getUserId());
+        allModel.clear(); myModel.clear(); certModel.clear();
+        for(Course c : db.getApprovedCourses()) if(!student.getEnrolledCourses().contains(c.getCourseId())) allModel.addElement(c);
+        for(Course c : db.getEnrolledCourses(student.getUserId())) myModel.addElement(c);
+        for(Certificate c : db.getCertificates(student.getUserId())) certModel.addElement(c);
         
-        Map<String, List<String>> progress = dbManager.getStudentById(student.getUserId()).getProgress();
-        List<String> completedLessonIds = progress.get(course.getCourseId());
-        
-        if (course.getLessons() != null) {
-            for (Lesson lesson : course.getLessons()) {
-                lessonListModel.addElement(lesson);
-            }
-        }
-        
-        // This is how you add a custom renderer to show "COMPLETED"
-        lessonList.setCellRenderer(new DefaultListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                Lesson lesson = (Lesson) value;
-                if (completedLessonIds != null && completedLessonIds.contains(lesson.getLessonId())) {
-                    setText(lesson.getTitle() + " (COMPLETED)");
-                    setForeground(Color.GRAY);
-                } else {
-                    setText(lesson.getTitle());
-                }
-                return c;
+        lList.setCellRenderer(new DefaultListCellRenderer() {
+            public Component getListCellRendererComponent(JList<?> l, Object v, int i, boolean s, boolean f) {
+                super.getListCellRendererComponent(l,v,i,s,f);
+                if (student.isLessonCompleted(((Lesson)v).getLessonId())) { setText(((Lesson)v).getTitle() + " (DONE)"); setForeground(Color.GRAY); }
+                return this;
             }
         });
     }
