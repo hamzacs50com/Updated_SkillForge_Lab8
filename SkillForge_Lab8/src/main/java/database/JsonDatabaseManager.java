@@ -147,16 +147,10 @@ public class JsonDatabaseManager {
         saveCourses();
     }
     
-    // --- UPDATED FOR MANUAL QUIZ ---
     public void addLesson(String courseId, String title, String content, Quiz quiz) {
         Course course = getCourseById(courseId);
         if (course != null) { 
             String lessonId = UUID.randomUUID().toString();
-            // If the instructor provided a quiz, we must update its lessonId to match the new lesson
-            if (quiz != null) {
-                // We recreate the quiz object to ensure IDs match, or just use the passed one if valid
-                // Simpler: Just assign the lesson ID conceptually
-            }
             Lesson newLesson = new Lesson(lessonId, title, content, new ArrayList<>(), quiz);
             course.getLessons().add(newLesson);
             saveCourses(); 
@@ -189,20 +183,14 @@ public class JsonDatabaseManager {
         if (c != null) { c.getLessons().removeIf(l -> l.getLessonId().equals(lId)); saveCourses(); }
     }
     
-    // --- UPDATED FOR MANUAL QUIZ EDITING ---
     public void updateLesson(String cId, String lId, String title, String content, Quiz newQuiz) {
         Course c = getCourseById(cId);
         if (c != null) {
             for (Lesson l : c.getLessons()) {
                 if (l.getLessonId().equals(lId)) { 
-                    l.setTitle(title); 
-                    l.setContent(content);
-                    // Only update quiz if a new one is provided (Instructor opted to change it)
-                    if (newQuiz != null) {
-                        l.setQuiz(newQuiz);
-                    }
-                    saveCourses(); 
-                    return; 
+                    l.setTitle(title); l.setContent(content);
+                    if (newQuiz != null) l.setQuiz(newQuiz);
+                    saveCourses(); return; 
                 }
             }
         }
@@ -239,9 +227,42 @@ public class JsonDatabaseManager {
         Student s = getStudentById(sId);
         return s != null ? s.getCertificates() : new ArrayList<>();
     }
+    
+    // --- REAL ANALYTICS LOGIC (Fixed) ---
     public Map<String, Double> getCourseStatistics(String cId) {
         Map<String, Double> stats = new HashMap<>();
-        stats.put("avgCompletion", 75.0); stats.put("avgQuizScore", 85.0);
+        Course course = getCourseById(cId);
+        List<Student> students = getEnrolledStudents(cId);
+        
+        if (course == null || students.isEmpty() || course.getLessons() == null) {
+            stats.put("avgCompletion", 0.0);
+            stats.put("avgQuizScore", 0.0);
+            return stats;
+        }
+
+        double totalQuizScore = 0;
+        int quizCount = 0;
+        int completedLessons = 0;
+        int totalLessonsPossible = students.size() * course.getLessons().size();
+
+        for (Student s : students) {
+            for (Lesson l : course.getLessons()) {
+                if (s.isLessonCompleted(l.getLessonId())) {
+                    completedLessons++;
+                    Integer score = s.getQuizScores().get(l.getLessonId());
+                    if (score != null) {
+                        totalQuizScore += score;
+                        quizCount++;
+                    }
+                }
+            }
+        }
+
+        double avgScore = (quizCount > 0) ? (totalQuizScore / quizCount) : 0.0;
+        double avgComp = (totalLessonsPossible > 0) ? ((double)completedLessons / totalLessonsPossible * 100) : 0.0;
+
+        stats.put("avgCompletion", avgComp);
+        stats.put("avgQuizScore", avgScore);
         return stats;
     }
 
