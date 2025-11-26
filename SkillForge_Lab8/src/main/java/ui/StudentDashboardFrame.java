@@ -71,6 +71,7 @@ public class StudentDashboardFrame extends JFrame {
         lList.addListSelectionListener(e -> {
             if(!e.getValueIsAdjusting()) {
                 Lesson l = lList.getSelectedValue();
+                content.setText(null);
                 if(l!=null) {
                     content.setText(l.getContent());
                     boolean done = student.isLessonCompleted(l.getLessonId());

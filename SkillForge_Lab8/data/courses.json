@@ -5,36 +5,6 @@
     "instructorId": "68c38d0c-43ae-4c5d-91d0-c011c53a7d62",
     "lessons": [
       {
-        "lessonId": "3812f46b-70ba-4891-ac92-f6d79c616849",
-        "title": "lesson 1",
-        "content": "khgckughckl",
-        "resources": [],
-        "quiz": {
-          "quizId": "fce5468c-96db-4238-a286-204d8150c9cc",
-          "lessonId": "3812f46b-70ba-4891-ac92-f6d79c616849",
-          "questions": [
-            {
-              "questionText": "Sample Question 1 for lesson 1",
-              "options": [
-                "Option A",
-                "Correct Option B",
-                "Option C"
-              ],
-              "correctOptionIndex": 1
-            },
-            {
-              "questionText": "Sample Question 2",
-              "options": [
-                "Correct Option A",
-                "Option B",
-                "Option C"
-              ],
-              "correctOptionIndex": 0
-            }
-          ]
-        }
-      },
-      {
         "lessonId": "92545615-1155-441e-a4d8-809d96ea35a1",
         "title": "ugcygcuk",
         "content": "yjgfgcygciyugucv",
@@ -97,7 +67,52 @@
         }
       }
     ],
-    "students": [],
+    "students": [
+      "1bb0ac15-14e0-4bfc-9cd8-6f83f82ffa71"
+    ],
+    "status": "APPROVED"
+  },
+  {
+    "courseId": "c4a07241-55c6-49e9-9df7-d614078cd360",
+    "title": "jgigi",
+    "description": "jhgjk",
+    "instructorId": "68c38d0c-43ae-4c5d-91d0-c011c53a7d62",
+    "lessons": [
+      {
+        "lessonId": "07e5479a-32c8-4abd-816d-38f3292ba8e4",
+        "title": "jkhgfiku",
+        "content": "jhyugfiyufg",
+        "resources": [],
+        "quiz": {
+          "quizId": "3a1ba74d-1189-4de1-adc9-6b8c31ab264c",
+          "lessonId": "",
+          "questions": [
+            {
+              "questionText": "kiugi 1",
+              "options": [
+                "khjkhgkujg",
+                "ujyfu",
+                "uyf"
+              ],
+              "correctOptionIndex": 0
+            },
+            {
+              "questionText": "ikhgiug 2",
+              "options": [
+                "jujgiug ",
+                "jhfi 2",
+                "jhg"
+              ],
+              "correctOptionIndex": 1
+            }
+          ]
+        }
+      }
+    ],
+    "students": [
+      "1bb0ac15-14e0-4bfc-9cd8-6f83f82ffa71",
+      "af8aa174-4d03-403a-b815-00ca95821e37"
+    ],
     "status": "APPROVED"
   }
 ]

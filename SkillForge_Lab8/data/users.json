@@ -8,11 +8,14 @@
   },
   {
     "enrolledCourses": [
-      "e2a96c44-5edc-4923-8ccc-77a2912a42ac"
+      "e2a96c44-5edc-4923-8ccc-77a2912a42ac",
+      "fc6c9665-cca3-4430-a6cb-c08a563395db",
+      "c4a07241-55c6-49e9-9df7-d614078cd360"
     ],
     "quizScores": {
-      "3812f46b-70ba-4891-ac92-f6d79c616849": 100,
-      "92545615-1155-441e-a4d8-809d96ea35a1": 100
+      "33acffe6-c76b-43c0-ae8a-dcbea9fe0f8c": 100,
+      "92545615-1155-441e-a4d8-809d96ea35a1": 100,
+      "07e5479a-32c8-4abd-816d-38f3292ba8e4": 50
     },
     "certificates": [
       {
@@ -22,6 +25,22 @@
         "courseId": "e2a96c44-5edc-4923-8ccc-77a2912a42ac",
         "courseTitle": "math",
         "issueDate": "2025-11-23"
+      },
+      {
+        "certificateId": "7997aef5-fda2-4f65-b595-d1fb190bd4c8",
+        "studentId": "1bb0ac15-14e0-4bfc-9cd8-6f83f82ffa71",
+        "studentName": "hamza",
+        "courseId": "fc6c9665-cca3-4430-a6cb-c08a563395db",
+        "courseTitle": "math2",
+        "issueDate": "2025-11-26"
+      },
+      {
+        "certificateId": "8b20d8ad-5e24-48c0-a446-398370dee37d",
+        "studentId": "1bb0ac15-14e0-4bfc-9cd8-6f83f82ffa71",
+        "studentName": "hamza",
+        "courseId": "c4a07241-55c6-49e9-9df7-d614078cd360",
+        "courseTitle": "jgigi",
+        "issueDate": "2025-11-26"
       }
     ],
     "userId": "1bb0ac15-14e0-4bfc-9cd8-6f83f82ffa71",
@@ -33,7 +52,8 @@
   {
     "createdCourses": [
       "e2a96c44-5edc-4923-8ccc-77a2912a42ac",
-      "fc6c9665-cca3-4430-a6cb-c08a563395db"
+      "fc6c9665-cca3-4430-a6cb-c08a563395db",
+      "c4a07241-55c6-49e9-9df7-d614078cd360"
     ],
     "userId": "68c38d0c-43ae-4c5d-91d0-c011c53a7d62",
     "username": "hazem",
@@ -47,5 +67,19 @@
     "email": "admin@gmail.com",
     "passwordHash": "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92",
     "role": "Admin"
+  },
+  {
+    "enrolledCourses": [
+      "c4a07241-55c6-49e9-9df7-d614078cd360"
+    ],
+    "quizScores": {
+      "07e5479a-32c8-4abd-816d-38f3292ba8e4": 0
+    },
+    "certificates": [],
+    "userId": "af8aa174-4d03-403a-b815-00ca95821e37",
+    "username": "mm",
+    "email": "mm@gmail.com",
+    "passwordHash": "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92",
+    "role": "Student"
   }
 ]
